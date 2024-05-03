@@ -1,0 +1,58 @@
+---
+- name: Install PHP and Apache2 on Ubuntu
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install PHP and Apache2
+      apt:
+        name:
+          - php
+          - apache2
+        state: present
+
+    - name: Install PHP modules
+      apt:
+        name:
+          - php-cli
+          - php-fpm
+          - php-mysql
+          - php-curl
+          - php-gd
+          - php-intl
+          - php-mbstring
+          - php-soap
+          - php-xml
+          - php-zip
+        state: present
+
+    - name: Enable Apache rewrite module
+      command: a2enmod rewrite
+      ignore_errors: yes
+
+    - name: Start Apache service
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Copy index.php file
+      template:
+        src: index.php.j2
+        dest: /var/www/html/index.php
+
+    - name: Create Apache configuration file
+      template:
+        src: apache_config.j2
+        dest: /etc/apache2/sites-enabled/000-default.conf
+      notify:
+        - Restart Apache service
+
+  handlers:
+    - name: Restart Apache service
+      service:
+        name: apache2
+        state: restarted

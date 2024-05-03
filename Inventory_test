@@ -1,0 +1,2 @@
+[server]
+server_name ansible_host=ip ansible_user=username ansible_ssh_pass=password ansible_ssh_extra_args='-o StrictHostKeyChecking=no'
